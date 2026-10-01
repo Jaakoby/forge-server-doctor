@@ -1,0 +1,2 @@
+[05:00:01] [main/INFO]: Starting minecraft server version 1.21.1
+Exception in thread "main" java.lang.UnsupportedClassVersionError: net/minecraft/server/Main has been compiled by a more recent version of the Java Runtime (class file version 65.0), this version of the Java Runtime only recognizes class file versions up to 61.0

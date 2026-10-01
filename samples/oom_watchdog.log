@@ -1,0 +1,4 @@
+[21:40:00] [Server thread/INFO]: Done (41.882s)! For help, type "help"
+[22:14:03] [Server Watchdog/ERROR]: A single server tick took 62.40 seconds (should be max 0.05)
+[22:14:03] [Server Watchdog/ERROR]: Considering it to be crashed, server will forcibly shutdown.
+[22:14:09] [Server thread/ERROR]: java.lang.OutOfMemoryError: Java heap space

@@ -1,0 +1,6 @@
+[08:11:42] [main/INFO]: Starting minecraft server version 1.20.1
+[08:11:42] [main/INFO]: Java Version: 17.0.9
+[08:11:43] [main/INFO]: Loading 112 mods:
+[08:11:50] [main/ERROR]: Missing or unsupported mandatory dependencies:
+	Mod ID: 'tacz', Requested by: 'coolguns'
+[08:11:50] [main/ERROR]: Mod coolguns requires tacz [1.0.3,) but it is missing

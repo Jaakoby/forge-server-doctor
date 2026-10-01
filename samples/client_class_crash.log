@@ -1,0 +1,9 @@
+[12:03:01] [main/INFO]: Starting minecraft server version 1.20.1
+[12:03:01] [main/INFO]: Loading 234 mods:
+[12:03:04] [main/INFO]: Forge mod loading, version 47.4.10, for MC 1.20.1
+[12:03:09] [modloading-worker-0/ERROR]: Failed to create mod instance. ModID: examplemod
+java.lang.BootstrapMethodError: java.lang.NoClassDefFoundError: net/minecraft/client/gui/screens/Screen
+	at com.example.examplemod.ExampleNetwork.init(ExampleNetwork.java:88)
+Caused by: java.lang.RuntimeException: Attempted to load class net/minecraft/client/gui/screens/Screen for invalid dist DEDICATED_SERVER
+	at net.minecraftforge.fml.loading.RuntimeDistCleaner.processClassWithFlags(RuntimeDistCleaner.java:61)
+[12:03:10] [main/FATAL]: Preparing crash report with UUID 9f2c
