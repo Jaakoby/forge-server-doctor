@@ -540,6 +540,59 @@ def wrap(text: str, width: int) -> List[str]:
     return lines
 
 
+def render_share(path: str, env: Dict[str, Optional[str]],
+                 findings: List[Finding]) -> str:
+    """A short Markdown block to paste into a forum or help thread.
+
+    People with a broken server do not paste a 400-line crash report — they
+    paste a wall of text nobody reads, and the thread dies. This gives them the
+    four things anyone helping actually needs: versions, the mod at fault, the
+    diagnosis and the fix. It is genuinely more useful to the person answering
+    than the raw log.
+
+    The attribution is one line at the end and is theirs to delete. The tool
+    earns the mention by having been useful first, or it does not deserve it.
+    """
+    out = io.StringIO()
+    p = out.write
+
+    mc = env.get("minecraft") or "?"
+    loader = env.get("loader_version") or "?"
+    p(f"**Minecraft {mc} / Forge {loader}**")
+    if env.get("mod_count"):
+        p(f" · {env['mod_count']} mods")
+    if env.get("java"):
+        p(f" · Java {env['java']}")
+    p("\n\n")
+
+    if env.get("culprit_jar"):
+        p(f"**Mod at fault:** `{env['culprit_jar']}`\n")
+        if env.get("culprit_symbol"):
+            p(f"**In:** `{env['culprit_symbol']}`\n")
+        p("\n")
+
+    if findings:
+        f = findings[0]
+        p(f"**Diagnosis:** {f.rule.title}\n\n")
+        p(f"> {' '.join(f.evidence.split())[:300]}\n\n")
+        p("**Fix:**\n\n")
+        for line in f.rule.fix.split("\n"):
+            if line.strip():
+                p(f"{line.strip()}\n")
+        p("\n")
+        if len(findings) > 1:
+            p(f"<sub>{len(findings) - 1} further finding(s) not shown.</sub>\n\n")
+        p(f"Full write-up: {FIX_URL % f.rule.id}\n\n")
+    else:
+        p("**No known failure pattern matched.** The culprit above is from the "
+          "first non-vanilla stack frame.\n\n")
+        p("Every failure mode, with fixes: https://jaakoby.github.io/fix/\n\n")
+
+    p("<sub>Diagnosed with forge-server-doctor (free, no dependencies): "
+      "https://github.com/Jaakoby/forge-server-doctor</sub>\n")
+    return out.getvalue()
+
+
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -548,6 +601,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         description="Diagnose a Forge/NeoForge Minecraft server log or crash report.",
     )
     ap.add_argument("logfile", nargs="+", help="latest.log, debug.log, or a crash-report (.gz ok)")
+    ap.add_argument("--share", action="store_true",
+                    help="short Markdown summary to paste into a help thread")
     ap.add_argument("--quiet", action="store_true", help="only print fatal findings")
     ap.add_argument("--version", action="version", version=f"forge-server-doctor {VERSION}")
     args = ap.parse_args(argv)
@@ -566,7 +621,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         if args.quiet:
             findings = [f for f in findings if f.rule.severity == FATAL]
 
-        print(render_text(path, env, findings))
+        if args.share:
+            print(render_share(path, env, findings))
+        else:
+            print(render_text(path, env, findings))
 
         if any(f.rule.severity == FATAL for f in findings):
             exit_code = max(exit_code, 1)

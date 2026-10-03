@@ -67,6 +67,19 @@ which is free to read either way.
 | `is not a valid mod file` | [A jar in mods/ isn't a valid mod](https://jaakoby.github.io/fix/missing-mod-file.html) | names the mod only |
 
 
+## Asking for help somewhere
+
+```bash
+python forge_doctor_free.py --share crash-reports/crash-....txt
+```
+
+Prints a short Markdown block to paste into a forum or help thread: your
+versions, the mod at fault, the diagnosis and the fix. People posting a
+400-line crash report get ignored because nobody reads 400 lines — this is the
+four things whoever answers actually needs.
+
+The last line credits the tool. Delete it if you'd rather; it's one line.
+
 ## What it doesn't do
 
 **Culprit attribution is in this free edition**, and it runs on every report
