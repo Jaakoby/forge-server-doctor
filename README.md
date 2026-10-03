@@ -32,6 +32,41 @@ and whether the server ever reached `Done`.
 When nothing matches, it says so and tells you where to look by hand. It does
 not invent a diagnosis to look useful.
 
+## Does it detect your error?
+
+Search this table for the text in your crash report. Every entry links to the
+full explanation and the fix — you don't need the tool to use those.
+
+| Text in your log | What it means | Free edition |
+|---|---|---|
+| `for invalid dist DEDICATED_SERVER` | [Client-only code reached the dedicated server](https://jaakoby.github.io/fix/client-class-on-server.html) | — |
+| `net.minecraftforge.fml.ModLoadingException` | [A client-only mod is installed on the server](https://jaakoby.github.io/fix/client-only-mod.html) | — |
+| `Missing or unsupported mandatory dependencies` | [A mod is missing a dependency](https://jaakoby.github.io/fix/missing-dependency.html) | — |
+| `DuplicateModsFoundException` | [The same mod is installed twice](https://jaakoby.github.io/fix/duplicate-mods.html) | yes |
+| `org.spongepowered.asm.mixin.` | [A mixin failed to apply](https://jaakoby.github.io/fix/mixin-failure.html) | — |
+| `MinecraftException: Failed to check session lock` | [The world folder is already in use](https://jaakoby.github.io/fix/world-lock.html) | yes |
+| `has been compiled by a more recent version of the Java Runtime` | [Wrong Java version](https://jaakoby.github.io/fix/java-version.html) | yes |
+| `java.lang.OutOfMemoryError:` | [Out of memory](https://jaakoby.github.io/fix/out-of-memory.html) | yes |
+| `Perhaps a server is already running on that port` | [The port is already taken](https://jaakoby.github.io/fix/port-in-use.html) | yes |
+| `You need to agree to the EULA` | [EULA not accepted](https://jaakoby.github.io/fix/eula.html) | yes |
+| `NoClassDefFoundError: Could not initialize class` | [A class failed during static initialisation](https://jaakoby.github.io/fix/static-init.html) | — |
+| `Forge Mod Loader could not load this save` | [World contains entries for mods that are gone](https://jaakoby.github.io/fix/registry-remap.html) | — |
+| `which is not compatible` | [Mod built for a different loader version](https://jaakoby.github.io/fix/loader-version.html) | — |
+| `Considering it to be crashed, server will forcibly shutdown` | [The server hung and the watchdog killed it](https://jaakoby.github.io/fix/watchdog.html) | — |
+| `java.lang.NoSuchMethodError:` | [Mods compiled against mismatched versions](https://jaakoby.github.io/fix/nosuchmethod.html) | — |
+| `com.electronwill.nightconfig.core.io.ParsingException` | [A config file is invalid](https://jaakoby.github.io/fix/config-crash.html) | — |
+| `Connection closed - mismatched mod channel list` | [Players are being kicked for a mod mismatch](https://jaakoby.github.io/fix/mod-rejections.html) | — |
+| `Parsing error loading recipe` | [A datapack or recipe failed to load](https://jaakoby.github.io/fix/datapack-recipe.html) | — |
+| `ClassNotFoundException:` | [A mod is missing one of its own classes (stale or partial jar)](https://jaakoby.github.io/fix/own-class-missing.html) | — |
+| `ResourceLocationException: Non` | [An invalid resource ID was loaded from config or a datapack](https://jaakoby.github.io/fix/bad-resource-location.html) | — |
+| `Exception ticking` | [A mod crashed while ticking an entity or block](https://jaakoby.github.io/fix/ticking-entity-mod-bug.html) | — |
+| `java.lang.Exception: Mod Loading has failed` | [Mod loading failed — the real cause is further down this report](https://jaakoby.github.io/fix/mod-loading-wrapper.html) | — |
+| `java.lang.IllegalStateException: Failed to initialize server` | [Server failed to initialise — look for the Caused by](https://jaakoby.github.io/fix/server-init-wrapper.html) | — |
+| `is not a valid mod file` | [A jar in mods/ isn't a valid mod](https://jaakoby.github.io/fix/missing-mod-file.html) | — |
+
+The six marked *yes* are what this free edition checks. The [paid tool](https://kaiven.gumroad.com/l/forge-server-doctor) covers all 24 and names the
+mod jar responsible from the stack trace.
+
 ## What it doesn't do
 
 The free edition handles startup problems. It does **not** diagnose mod
