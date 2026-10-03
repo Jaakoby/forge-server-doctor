@@ -90,6 +90,19 @@ them in your log and hand you the fix, not for access to the knowledge.
 
 <https://kaiven.gumroad.com/l/forge-server-doctor>
 
+## How this was built
+
+Built by Jakoby Tuckta with Claude, against a live 234-mod Forge server. The
+code was written with Claude; the crash reports, the production server it was
+tested on, and the calls about what shipped are mine. Every commit is tagged
+`Co-Authored-By: Claude`.
+
+The first version passed every test we wrote and then diagnosed three of eight
+real crash reports — because the same author had written both the samples and
+the patterns. It was rebuilt from thirteen genuine crash reports. That rebuild,
+not who typed it, is why it works. [The full account of what the real data
+corrected](https://jaakoby.github.io/how-this-was-built.html).
+
 ## Honest limits
 
 It reads logs, not your mods. A native JVM crash leaves no Java trace to parse —
