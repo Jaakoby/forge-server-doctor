@@ -34,50 +34,59 @@ not invent a diagnosis to look useful.
 
 ## Does it detect your error?
 
-Search this table for the text in your crash report. Every entry links to the
-full explanation and the fix — you don't need the tool to use those.
+The free edition **names the mod jar on every one of these**. It prints the
+diagnosis and fix for the six marked *yes*; for the rest it will name the mod
+and say it does not recognise the error. Each row links to the full write-up,
+which is free to read either way.
 
-| Text in your log | What it means | Free edition |
+| Text in your log | What it means | Diagnosed by free edition |
 |---|---|---|
-| `for invalid dist DEDICATED_SERVER` | [Client-only code reached the dedicated server](https://jaakoby.github.io/fix/client-class-on-server.html) | — |
-| `net.minecraftforge.fml.ModLoadingException` | [A client-only mod is installed on the server](https://jaakoby.github.io/fix/client-only-mod.html) | — |
-| `Missing or unsupported mandatory dependencies` | [A mod is missing a dependency](https://jaakoby.github.io/fix/missing-dependency.html) | — |
+| `for invalid dist DEDICATED_SERVER` | [Client-only code reached the dedicated server](https://jaakoby.github.io/fix/client-class-on-server.html) | names the mod only |
+| `net.minecraftforge.fml.ModLoadingException` | [A client-only mod is installed on the server](https://jaakoby.github.io/fix/client-only-mod.html) | names the mod only |
+| `Missing or unsupported mandatory dependencies` | [A mod is missing a dependency](https://jaakoby.github.io/fix/missing-dependency.html) | names the mod only |
 | `DuplicateModsFoundException` | [The same mod is installed twice](https://jaakoby.github.io/fix/duplicate-mods.html) | yes |
-| `org.spongepowered.asm.mixin.` | [A mixin failed to apply](https://jaakoby.github.io/fix/mixin-failure.html) | — |
+| `org.spongepowered.asm.mixin.` | [A mixin failed to apply](https://jaakoby.github.io/fix/mixin-failure.html) | names the mod only |
 | `MinecraftException: Failed to check session lock` | [The world folder is already in use](https://jaakoby.github.io/fix/world-lock.html) | yes |
 | `has been compiled by a more recent version of the Java Runtime` | [Wrong Java version](https://jaakoby.github.io/fix/java-version.html) | yes |
 | `java.lang.OutOfMemoryError:` | [Out of memory](https://jaakoby.github.io/fix/out-of-memory.html) | yes |
 | `Perhaps a server is already running on that port` | [The port is already taken](https://jaakoby.github.io/fix/port-in-use.html) | yes |
 | `You need to agree to the EULA` | [EULA not accepted](https://jaakoby.github.io/fix/eula.html) | yes |
-| `NoClassDefFoundError: Could not initialize class` | [A class failed during static initialisation](https://jaakoby.github.io/fix/static-init.html) | — |
-| `Forge Mod Loader could not load this save` | [World contains entries for mods that are gone](https://jaakoby.github.io/fix/registry-remap.html) | — |
-| `which is not compatible` | [Mod built for a different loader version](https://jaakoby.github.io/fix/loader-version.html) | — |
-| `Considering it to be crashed, server will forcibly shutdown` | [The server hung and the watchdog killed it](https://jaakoby.github.io/fix/watchdog.html) | — |
-| `java.lang.NoSuchMethodError:` | [Mods compiled against mismatched versions](https://jaakoby.github.io/fix/nosuchmethod.html) | — |
-| `com.electronwill.nightconfig.core.io.ParsingException` | [A config file is invalid](https://jaakoby.github.io/fix/config-crash.html) | — |
-| `Connection closed - mismatched mod channel list` | [Players are being kicked for a mod mismatch](https://jaakoby.github.io/fix/mod-rejections.html) | — |
-| `Parsing error loading recipe` | [A datapack or recipe failed to load](https://jaakoby.github.io/fix/datapack-recipe.html) | — |
-| `ClassNotFoundException:` | [A mod is missing one of its own classes (stale or partial jar)](https://jaakoby.github.io/fix/own-class-missing.html) | — |
-| `ResourceLocationException: Non` | [An invalid resource ID was loaded from config or a datapack](https://jaakoby.github.io/fix/bad-resource-location.html) | — |
-| `Exception ticking` | [A mod crashed while ticking an entity or block](https://jaakoby.github.io/fix/ticking-entity-mod-bug.html) | — |
-| `java.lang.Exception: Mod Loading has failed` | [Mod loading failed — the real cause is further down this report](https://jaakoby.github.io/fix/mod-loading-wrapper.html) | — |
-| `java.lang.IllegalStateException: Failed to initialize server` | [Server failed to initialise — look for the Caused by](https://jaakoby.github.io/fix/server-init-wrapper.html) | — |
-| `is not a valid mod file` | [A jar in mods/ isn't a valid mod](https://jaakoby.github.io/fix/missing-mod-file.html) | — |
+| `NoClassDefFoundError: Could not initialize class` | [A class failed during static initialisation](https://jaakoby.github.io/fix/static-init.html) | names the mod only |
+| `Forge Mod Loader could not load this save` | [World contains entries for mods that are gone](https://jaakoby.github.io/fix/registry-remap.html) | names the mod only |
+| `which is not compatible` | [Mod built for a different loader version](https://jaakoby.github.io/fix/loader-version.html) | names the mod only |
+| `Considering it to be crashed, server will forcibly shutdown` | [The server hung and the watchdog killed it](https://jaakoby.github.io/fix/watchdog.html) | names the mod only |
+| `java.lang.NoSuchMethodError:` | [Mods compiled against mismatched versions](https://jaakoby.github.io/fix/nosuchmethod.html) | names the mod only |
+| `com.electronwill.nightconfig.core.io.ParsingException` | [A config file is invalid](https://jaakoby.github.io/fix/config-crash.html) | names the mod only |
+| `Connection closed - mismatched mod channel list` | [Players are being kicked for a mod mismatch](https://jaakoby.github.io/fix/mod-rejections.html) | names the mod only |
+| `Parsing error loading recipe` | [A datapack or recipe failed to load](https://jaakoby.github.io/fix/datapack-recipe.html) | names the mod only |
+| `ClassNotFoundException:` | [A mod is missing one of its own classes (stale or partial jar)](https://jaakoby.github.io/fix/own-class-missing.html) | names the mod only |
+| `ResourceLocationException: Non` | [An invalid resource ID was loaded from config or a datapack](https://jaakoby.github.io/fix/bad-resource-location.html) | names the mod only |
+| `Exception ticking` | [A mod crashed while ticking an entity or block](https://jaakoby.github.io/fix/ticking-entity-mod-bug.html) | names the mod only |
+| `java.lang.Exception: Mod Loading has failed` | [Mod loading failed — the real cause is further down this report](https://jaakoby.github.io/fix/mod-loading-wrapper.html) | names the mod only |
+| `java.lang.IllegalStateException: Failed to initialize server` | [Server failed to initialise — look for the Caused by](https://jaakoby.github.io/fix/server-init-wrapper.html) | names the mod only |
+| `is not a valid mod file` | [A jar in mods/ isn't a valid mod](https://jaakoby.github.io/fix/missing-mod-file.html) | names the mod only |
 
-The six marked *yes* are what this free edition checks. The [paid tool](https://kaiven.gumroad.com/l/forge-server-doctor) covers all 24 and names the
-mod jar responsible from the stack trace.
 
 ## What it doesn't do
 
-The free edition handles startup problems. It does **not** diagnose mod
-conflicts, and it will not tell you which mod crashed you.
+**Culprit attribution is in this free edition**, and it runs on every report
+— including the ones where no rule matches, which is the most common case.
+Forge annotates each stack frame with the jar it came from; this walks the
+trace, skips Minecraft, Forge, the JDK and the bundled libraries, and names the
+first mod jar left. That is usually the whole answer.
 
-The full version adds 18 more failure modes — client-only code on a dedicated
-server, mixin conflicts, missing dependencies, stale or partial jars, invalid
-resource IDs, registry remapping, mod-rejection kicks, watchdog timeouts, and
-Forge's own wrapper errors that hide the real cause — plus **culprit
-attribution**: it walks the stack trace, skips Minecraft, Forge, the JDK and the
-bundled libraries, and names the mod jar at fault.
+What the free edition does *not* do is diagnose the other 18 failure modes.
+It will name the mod, then tell you it does not recognise the error.
+
+The full version adds those 18 — client-only code on a dedicated server, mixin
+conflicts, missing dependencies, stale or partial jars, invalid resource IDs,
+registry remapping, mod-rejection kicks, watchdog timeouts, and Forge's own
+wrapper errors that hide the real cause — each with the specific fix written
+out, plus `--json` for start scripts.
+
+Every one of those failure modes is also [written out in full, free to
+read](https://jaakoby.github.io/fix/). You are paying for the tool to match
+them in your log and hand you the fix, not for access to the knowledge.
 
 <https://kaiven.gumroad.com/l/forge-server-doctor>
 

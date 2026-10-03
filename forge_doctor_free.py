@@ -30,13 +30,15 @@ VERSION = "1.0.0-free"
 
 UPGRADE_NOTICE = """
   ──────────────────────────────────────────────────────────────────────
-  This is the FREE edition: 6 startup checks.
+  FREE edition: 6 startup checks, plus culprit attribution.
 
-  The full version adds 18 more failure modes — client-only code on a
-  dedicated server, mixin conflicts, missing dependencies, stale jars,
-  invalid resource IDs, registry remapping, mod-rejection kicks — and
-  CULPRIT ATTRIBUTION, which reads the stack trace and names the mod jar
-  at fault. That is the part that answers "which mod did it".
+  Every failure mode, with the fix for each, is free to read:
+    https://jaakoby.github.io/fix/
+
+  The full version diagnoses 18 more of them in the log itself —
+  mixin conflicts, missing dependencies, stale jars, invalid resource
+  IDs, registry remapping, mod-rejection kicks, watchdog timeouts — and
+  prints the specific fix instead of leaving you to match it by hand.
 
   https://kaiven.gumroad.com/l/forge-server-doctor
   ──────────────────────────────────────────────────────────────────────
@@ -216,8 +218,42 @@ for _r in RULES:
 
 
 
+# Frames belonging to Minecraft, Forge and the JVM never identify a culprit.
+_VANILLA = re.compile(
+    # Minecraft, the loader itself, and the JVM.
+    r"(server-1\.|client-1\.|forge-\d|neoforge-\d|^java\.|^jdk\.|^sun\.|"
+    r"fmlcore|fmlloader|fmlearlydisplay|javafmllanguage|lowcodelanguage|mclanguage|"
+    r"modlauncher|securejarhandler|bootstraplauncher|"
+    r"^net\.minecraftforge|^net\.neoforged|^cpw\.mods|"
+    # Shared libraries that ship inside the server are never the culprit.
+    r"netty-|^io\.netty|^com\.google|^org\.apache|^org\.slf4j|^com\.mojang|"
+    r"eventbus-|brigadier-|guava-|mixin-|log4j|slf4j|gson-|commons-|asm-|"
+    r"jopt-|oshi-|^joptsimple|^oshi|authlib-|datafixerupper-|"
+    r"^com\.electronwill|nightconfig)",
+    re.I,
+)
 
 
+def blame_mod(lines: List[str]) -> Optional[Dict[str, str]]:
+    """Name the mod that owns the first non-vanilla frame in the stack trace.
+
+    Forge annotates every frame with the jar it came from, like
+    `~[examplemod-2.4.0.jar%23132!/:2.4.0]`. The first such frame that is not
+    Minecraft, Forge or the JDK is almost always the mod at fault.
+    """
+    frame_re = re.compile(r"^\s+at ([\w$\.]+)\([^)]*\)\s*~?\[([^\]]+)\]")
+    for line in lines:
+        m = frame_re.match(line)
+        if not m:
+            continue
+        symbol, origin = m.group(1), m.group(2)
+        jar = origin.split("%")[0].split("!")[0]
+        if _VANILLA.search(jar) or _VANILLA.search(symbol):
+            continue
+        if not jar.endswith(".jar"):
+            continue
+        return {"jar": jar, "symbol": symbol}
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -269,6 +305,8 @@ def environment(lines: List[str]) -> Dict[str, Optional[str]]:
         "xmx": None,
         "description": None,
         "exception": None,
+        "culprit_jar": None,
+        "culprit_symbol": None,
     }
     joined = "\n".join(lines[:400]) + "\n".join(lines[-200:])
 
@@ -325,6 +363,10 @@ def environment(lines: List[str]) -> Dict[str, Optional[str]]:
 
     env["started_ok"] = "yes" if re.search(r'Done \([\d\.]+s\)', "\n".join(lines)) else "no"
 
+    culprit = blame_mod(lines)
+    if culprit:
+        env["culprit_jar"] = culprit["jar"]
+        env["culprit_symbol"] = culprit["symbol"]
     return env
 
 
@@ -386,6 +428,9 @@ def truncate(s: str, n: int = 160) -> str:
     return s if len(s) <= n else s[: n - 1] + "…"
 
 
+FIX_URL = "https://jaakoby.github.io/fix/%s.html"
+
+
 def render_text(path: str, env: Dict[str, Optional[str]], findings: List[Finding]) -> str:
     out = io.StringIO()
     p = out.write
@@ -411,6 +456,10 @@ def render_text(path: str, env: Dict[str, Optional[str]], findings: List[Finding
         p(f"\n  Crash description: {env['description']}\n")
     if env.get("exception"):
         p(f"  Thrown:            {env['exception']}\n")
+    if env.get("culprit_jar"):
+        p(f"\n  CULPRIT (first non-vanilla frame):\n")
+        p(f"    {env['culprit_jar']}\n")
+        p(f"    in {env['culprit_symbol']}\n")
     p("\n")
 
     if not findings:
@@ -426,6 +475,10 @@ def render_text(path: str, env: Dict[str, Optional[str]], findings: List[Finding
             "    - A native crash (no Java stack trace, no crash-report written)\n"
             "      usually means the JVM itself died. Look for an hs_err_pid file\n"
             "      next to the server jar.\n"
+            "\n"
+            "  Every failure mode, with what it means and the fix, is written out\n"
+            "  here -- search it for the text in your log:\n"
+            "    https://jaakoby.github.io/fix/\n"
         )
         return out.getvalue()
 
@@ -457,6 +510,7 @@ def render_text(path: str, env: Dict[str, Optional[str]], findings: List[Finding
         for line in f.rule.fix.split("\n"):
             p(f"       {line}\n")
         p("\n")
+        p(f"     Full write-up: {FIX_URL % f.rule.id}\n\n")
         if n != len(findings):
             p(THIN + "\n\n")
 
