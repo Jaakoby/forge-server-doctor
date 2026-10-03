@@ -241,7 +241,12 @@ def blame_mod(lines: List[str]) -> Optional[Dict[str, str]]:
     `~[examplemod-2.4.0.jar%23132!/:2.4.0]`. The first such frame that is not
     Minecraft, Forge or the JDK is almost always the mod at fault.
     """
-    frame_re = re.compile(r"^\s+at ([\w$\.]+)\([^)]*\)\s*~?\[([^\]]+)\]")
+    # `<` and `>` must be in the symbol class: constructors appear as
+    # `TechMod.<init>` and static initialisers as `<clinit>`, and a mod failing
+    # in its own constructor is one of the most common startup crashes there
+    # is. Without them this silently matched nothing and named no culprit at
+    # all -- on both Forge and NeoForge.
+    frame_re = re.compile(r"^\s+at ([\w$.<>]+)\([^)]*\)\s*~?\[([^\]]+)\]")
     for line in lines:
         m = frame_re.match(line)
         if not m:
@@ -320,6 +325,11 @@ def environment(lines: List[str]) -> Dict[str, Optional[str]]:
     # loose fallbacks are last because `forge-1.20.1-47.4.10-universal.jar`
     # will happily hand you the MINECRAFT version if you match too eagerly.
     for pat in (
+        # NeoForge reports "NeoForge: net.neoforged:neoforge:21.1.72" -- the
+        # package is net.neoforge*d*, which the Forge pattern below cannot
+        # match. We sold "Forge & NeoForge" with this untested; it read the
+        # loader as "not found" on every NeoForge crash report.
+        r"NeoForge:\s*net\.neoforged:neoforge:(\d+\.\d+[\.\d]*)",
         r"Forge:\s*net\.(?:neo)?(?:minecraft)?forge:(?:forge:)?(\d+\.\d+[\.\d]*)",
         r"(?:neo)?forge-\d+\.\d+(?:\.\d+)?-(\d+\.\d+[\.\d]*)-universal",
         r"(?:neo)?forge[^\n]{0,24}?version[:\s]+(\d+\.\d+[\.\d]*)",
@@ -557,7 +567,7 @@ def render_share(path: str, env: Dict[str, Optional[str]],
     p = out.write
 
     mc = env.get("minecraft") or "?"
-    loader = env.get("loader_version") or "?"
+    loader = env.get("forge") or "?"
     p(f"**Minecraft {mc} / Forge {loader}**")
     if env.get("mod_count"):
         p(f" · {env['mod_count']} mods")
