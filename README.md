@@ -122,5 +122,5 @@ It reads logs, not your mods. A native JVM crash leaves no Java trace to parse â
 look for an `hs_err_pid` file instead. It can be wrong. Back up your world before
 acting on anything that deletes configs or drops registry entries.
 
-Free to use and to share. Not affiliated with Mojang, Microsoft, MinecraftForge
-or NeoForged.
+Free to use on any server you own or administer â€” see `LICENSE.txt`. Not
+affiliated with Mojang, Microsoft, MinecraftForge or NeoForged.

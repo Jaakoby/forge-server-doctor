@@ -246,19 +246,35 @@ def blame_mod(lines: List[str]) -> Optional[Dict[str, str]]:
     # in its own constructor is one of the most common startup crashes there
     # is. Without them this silently matched nothing and named no culprit at
     # all -- on both Forge and NeoForge.
-    frame_re = re.compile(r"^\s+at ([\w$.<>]+)\([^)]*\)\s*~?\[([^\]]+)\]")
+    annotated = re.compile(r"^\s+at ([\w$.<>]+)\([^)]*\)\s*~?\[([^\]]+)\]")
+    # Plenty of real traces carry NO jar annotation: crash-reports/*.txt, the
+    # `Caused by:` chain, and anything a mod prints itself. On those the
+    # annotated matcher named nobody at all -- silently, and this is the single
+    # most valuable thing the tool does. Fall back to the package of the first
+    # non-vanilla frame and say plainly that the log did not name a jar.
+    plain = re.compile(r"^\s+at ([\w$.<>]+)\([^)]*\)\s*$")
+    fallback = None
     for line in lines:
-        m = frame_re.match(line)
-        if not m:
-            continue
-        symbol, origin = m.group(1), m.group(2)
-        jar = origin.split("%")[0].split("!")[0]
-        if _VANILLA.search(jar) or _VANILLA.search(symbol):
-            continue
-        if not jar.endswith(".jar"):
-            continue
-        return {"jar": jar, "symbol": symbol}
-    return None
+        m = annotated.match(line)
+        if m:
+            symbol, origin = m.group(1), m.group(2)
+            jar = origin.split("%")[0].split("!")[0]
+            if _VANILLA.search(jar) or _VANILLA.search(symbol):
+                continue
+            if not jar.endswith(".jar"):
+                continue
+            return {"jar": jar, "symbol": symbol, "package": None}
+        if fallback is None:
+            m = plain.match(line)
+            if m:
+                symbol = m.group(1)
+                # _VANILLA covers the loader and the JDK but not Minecraft's
+                # own classes, which are matched by jar name elsewhere.
+                if _VANILLA.search(symbol) or symbol.startswith("net.minecraft."):
+                    continue
+                fallback = {"jar": None, "symbol": symbol,
+                            "package": ".".join(symbol.split(".")[:3])}
+    return fallback
 
 
 # ---------------------------------------------------------------------------
@@ -312,6 +328,7 @@ def environment(lines: List[str]) -> Dict[str, Optional[str]]:
         "exception": None,
         "culprit_jar": None,
         "culprit_symbol": None,
+        "culprit_package": None,
     }
     joined = "\n".join(lines[:400]) + "\n".join(lines[-200:])
 
@@ -377,6 +394,7 @@ def environment(lines: List[str]) -> Dict[str, Optional[str]]:
     if culprit:
         env["culprit_jar"] = culprit["jar"]
         env["culprit_symbol"] = culprit["symbol"]
+        env["culprit_package"] = culprit.get("package")
     return env
 
 
@@ -470,6 +488,12 @@ def render_text(path: str, env: Dict[str, Optional[str]], findings: List[Finding
         p(f"\n  CULPRIT (first non-vanilla frame):\n")
         p(f"    {env['culprit_jar']}\n")
         p(f"    in {env['culprit_symbol']}\n")
+    elif env.get("culprit_package"):
+        p(f"\n  CULPRIT (first non-vanilla frame):\n")
+        p(f"    {env['culprit_package']}\n")
+        p(f"    in {env['culprit_symbol']}\n")
+        p("    (this log does not name the jar for that frame -- match the\n")
+        p("     package above against your mods folder)\n")
     p("\n")
 
     if not findings:
@@ -575,8 +599,8 @@ def render_share(path: str, env: Dict[str, Optional[str]],
         p(f" · Java {env['java']}")
     p("\n\n")
 
-    if env.get("culprit_jar"):
-        p(f"**Mod at fault:** `{env['culprit_jar']}`\n")
+    if env.get("culprit_jar") or env.get("culprit_package"):
+        p(f"**Mod at fault:** `{env.get('culprit_jar') or env['culprit_package']}`\n")
         if env.get("culprit_symbol"):
             p(f"**In:** `{env['culprit_symbol']}`\n")
         p("\n")
