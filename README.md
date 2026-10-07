@@ -9,6 +9,13 @@ python forge_doctor_free.py crash-reports/crash-2026-10-01_12.34.56-server.txt
 
 One file. No dependencies. Python 3.8+. Forge and NeoForge, 1.16–1.21.
 
+Or install it from PyPI and skip the download:
+
+```bash
+pip install forge-server-doctor
+forge-doctor logs/latest.log
+```
+
 ## What the free edition checks
 
 The six things that stop a server from starting, each with the actual fix
